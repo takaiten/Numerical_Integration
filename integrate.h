@@ -1,22 +1,29 @@
 #ifndef INTEGRATE_H
 #define INTEGRATE_H
 
-#include <cmath>
 #include <functional>
+#include <vector>
 
 namespace Numerical_Integration
 {
-    class Integration_rules
+    class Integration_Scheme
     {
+    protected:
+        std::vector<double> m_points,
+                            m_weights;
     public:
-        double rectangle_rule(const std::vector<double> &x, double h, const std::function<double(double)>& func); // h in parameters to test speed
-        double rectangle_rule(const std::vector<double> &x, const std::function<double(double)>& func);
+        enum Integration_Type
+        {
+            rectangle,
+            trapezoid,
+            simpson,
+            gauss2,
+            gauss5
+        };
         
-        double trapezoid_rule(double a, double b, int n, const std::function<double(double)>& func);
-        double trapezoid_rule(const std::vector<double> &x, const std::function<double(double)>& func);
+        explicit Integration_Scheme(Integration_Type type);
         
-        double simpson_rule(double a, double b, int n, const std::function<double(double)>& func);
-        double simpson_rule(const std::vector<double> &x, const std::function<double(double)>& func);
+        double calculate(double from, double to, int segments, const std::function<double(double)> &func) const;
     };
 }
 

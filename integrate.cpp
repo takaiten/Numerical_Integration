@@ -1,63 +1,49 @@
 #include "integrate.h"
+#include <cmath>
 
 namespace Numerical_Integration
 {
-    double Integration_rules::rectangle_rule(const std::vector<double>& x, double h, const std::function<double(double)>& func)
+    Integration_Scheme::Integration_Scheme(Integration_Type type)
     {
-        double result = 0.0f;
-        for (int i = 0; i < x.size() - 1; i++)
-            result += func((x[i] + x[i + 1]) / 2);
-        return result * h;
+        switch (type)
+        {
+            case rectangle:
+                m_points = {0.0f};
+                m_weights = {2.0f};
+                break;
+            case trapezoid:
+                m_points = {-1.0f, 1.0f};
+                m_weights = {1.0f, 1.0f};
+                break;
+            case simpson:
+                m_points = {-1.0f, 0.0f, 1.0f};
+                m_weights = {1.0f/3, 4.0f/3, 1.0f/3};
+                break;
+            case gauss2:
+                // insert weights and points here
+                break;
+            case gauss5:
+                m_points = {-0.90618, -0.538469, 0, 0.538469, 0.90618};
+                m_weights = {0.236927, 0.478629, 0.568889, 0.478629, 0.236927};
+                break;
+        }
     }
     
-    double Integration_rules::rectangle_rule(const std::vector<double>& x, const std::function<double(double)>& func)
+    double Integration_Scheme::calculate(double from, double to, int segments, const std::function<double(double)>& func) const
     {
-        double result = 0.0f;
-        for (int i = 0; i < x.size() - 1; i++)
-            result += func((x[i] + x[i + 1]) / 2);
-        return result * (x[1] - x[0]);
-    }
+        double result = 0.0f,
+                x0;
+        double h = fabs(from - to) / static_cast<double>(segments);
     
-    double Integration_rules::trapezoid_rule(double a, double b, int n, const std::function<double(double)>& func)
-    {
-        double step = fabs(b - a) / (double) n,
-                result = 0.5 * (func(a) + func(b));
-        for (int i = 0; i < n; i++)
-            result += func(a + i * step);
-        result *= step;
-        return result;
-    }
-    
-    double Integration_rules::trapezoid_rule(const std::vector<double>& x, const std::function<double(double)>& func)
-    {
-        double result = 0.0f;
-        int size = x.size();
-        
-        result += (func(x[0]) + func(x[size])) / 2;
-        for (int i = 1; i < size - 1; i++)
-            result += func(x[i]);
-        
-        return result * (x[1] - x[0]);
-    }
-    
-    double Integration_rules::simpson_rule(double a, double b, int n, const std::function<double(double)>& func)
-    {
-        if (n % 2) n++;
-        double step = fabs(b - a) / (double) n,
-                result = func(a) + 4 * func(a + step) + func(b);
-        for (int i = 0; i < n / 2; i++)
-            result += 2 * func(a + (2 * i) * step) + 4 * func(a + (2 * i + 1) * step);
-        result *= step / 3;
-        return result;
-    }
-    
-    double Integration_rules::simpson_rule(const std::vector<double>& x, const std::function<double(double)>& func)
-    {
-        double result = 0.0f;
-        
-        for (int i = 1; i < x.size() - 1; i += 2)
-            result += func(x[i - 1]) + 4 * func(x[i]) + func(x[i + 1]);
-        
-        return result * (x[1] - x[0]) / 3;
+        for (int i = 0; i < segments; i++)
+        {
+            x0 = from + i * h;
+            for (int j = 0; j < m_points.size(); j++)
+            {
+                double p = x0 + (1 + m_points[j]) * h / 2;
+                result += m_weights[j] * func(p);
+            }
+        }
+        return result * h / 2.0f;
     }
 }

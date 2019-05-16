@@ -1,34 +1,46 @@
 #define _USE_MATH_DEFINES
 
 #include <iostream>
+#include <iomanip>
+#include <cmath>
+
 #include "integrate.h"
-#include "split.h"
 
 using namespace Numerical_Integration;
 
 int main()
 {
-    auto function = [](double x)
-    { return 7 * pow(x, 3) - 8 * pow(x, 2) - 3*x + 3; }; // on [-1, 1] = 2/3
+    auto f = [](double x)
+    { return sin(x); };
     
-    Integration_rules I;
+    auto F = [](double x)
+    { return -cos(x); };
     
-    double a = -1.0f, b = 1.0f;
-    int n = 10;
-    std::vector<double> split = regular(a, b, n);
+    double a = 0,
+           b = 3 * M_PI / 2;
+    int N = 10;
     
-    std::cout << "A = " << a
-              << "\tB = " << b
-              << "\tN = " << n << std::endl << std::endl;
+    std::cout << "a = " << a
+              << "\tb = " << b << std::endl << std::endl;
     
-    double result = I.rectangle_rule(split, function);
-    std::cout << "Rectangle rule: " << result << std::endl << std::endl;
     
-    result = I.trapezoid_rule(split, function);
-    std::cout << "Trapezoid rule: " << result << std::endl << std::endl;
-    
-    result = I.simpson_rule(regular(a, b, n * 2), function);
-    std::cout << "Simpson rule: " << result << std::endl << std::endl;
+    // test all integration rules on different h
+    for (int i = 0; i <= Integration_Scheme::gauss5; i++)
+    {
+        std::cout << "type: " << i << std::endl;
+        
+        Integration_Scheme I((Integration_Scheme::Integration_Type) i);
+        for (int j = 1; j < 5; j *= 2)
+        {
+            double I_calc = I.calculate(a, b, N * j, f);
+            double I_true = F(b) - F(a);
+            std::cout << std::endl << "H = " << fabs(b - a) / (N * j) << std::endl
+                      << "calculated: " << I_calc << std::endl
+                      << "true: " << I_true << std::endl
+                      << "diff: " << fabs(I_calc - I_true) << std::endl;
+        }
+        std::cout << std::endl << std::endl;
+    }
     
     return 0;
 }
