@@ -11,10 +11,10 @@ using namespace Numerical_Integration;
 int main()
 {
     auto f = [](double x)
-    { return sin(x); };
+    { return sin(x); };     // sin(10000 * x)
     
     auto F = [](double x)
-    { return -cos(x); };
+    { return -cos(x); };    // (sin(10000 * x) - 10000 * x * cos(10000 * x))/100000000
     
     double a = 0,
            b = 3 * M_PI / 2;
