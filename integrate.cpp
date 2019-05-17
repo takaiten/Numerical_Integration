@@ -20,7 +20,8 @@ namespace Numerical_Integration
                 m_weights = {1.0f/3, 4.0f/3, 1.0f/3};
                 break;
             case gauss2:
-                // insert weights and points here
+                m_points = {-0.57735, 0.57735};
+                m_weights = {1.0f};
                 break;
             case gauss5:
                 m_points = {-0.90618, -0.538469, 0, 0.538469, 0.90618};
