@@ -17,7 +17,7 @@ namespace Numerical_Integration
                 break;
             case gauss2:
                 m_points = {-0.57735, 0.57735};
-                m_weights = {1.0f, 1.0f, 1.0f};
+                m_weights = {1.0f, 1.0f};
                 break;
             case gauss5:
                 m_points = {-0.90618, -0.538469, 0, 0.538469, 0.90618};
